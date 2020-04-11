@@ -25,7 +25,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     private lateinit var map: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var storesByGeo : List<Store>
+    //private lateinit var storesByGeo : List<Store> //전역변수
 
     //현재 위치 객체
     private lateinit var lastLocation: Location
@@ -79,9 +79,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             fetchJson(lastLocation);
         }
 
-        var location : LatLng
-        location = LatLng(37.566554, 126.978546)
-        placeMarkerOnMap(location)
+        /*var pinLocation : LatLng
+        // location = LatLng(37.566554, 126.978546) //서울시청 핀 코드
+        pinLocation = LatLng(storesByGeo.get(0).lat, storesByGeo.get(0).lng)
+        placeMarkerOnMap(pinLocation)*/
 
         // Add a marker in Seoul and move the camera (처음 서울 기반 zoom)
         /*
@@ -126,12 +127,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                     .getAsJsonObject().get("stores")
                 //여기까진 제대로 되고
                 val type = object : TypeToken<List<Store>>() {}.type
-                storesByGeo = gson.fromJson<List<Store>>(rootObj, type)
+                var storesByGeo = gson.fromJson<List<Store>>(rootObj, type)
 
 //                val storesByGeo =  gson.fromJson<List<Store>>(rootObj, StoresByGeo::class.java)
                 //썸네일을 위한 추가 작업
                 println("--------store[0]---------")
                 println(storesByGeo.get(0).name)
+
+                for (store in storesByGeo)
+                {
+                    var pinLocation : LatLng
+                    pinLocation = LatLng(store.lat, store.lng)
+                    runOnUiThread{ placeMarkerOnMap(pinLocation) } //마크 찍는 메소드 (ui는 메인쓰레드에서)
+                }
+
+
 
                 //백그라운드에서 돌기 때문에 메인UI로 접근할 수 있도록 해줘야 한다.
                 runOnUiThread {
@@ -139,6 +149,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 //                    my_recycler_view.adapter = RecyclerViewAdapter(books)
                 }
             }
+
             override fun onFailure(call: Call, e: IOException) {
                 println("리퀘스트 실패")
             }
