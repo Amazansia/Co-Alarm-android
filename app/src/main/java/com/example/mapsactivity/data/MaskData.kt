@@ -11,3 +11,7 @@ data class Store(
     val stock_at: String,
     val type: String
 )
+
+data class StoresByGeo(
+    val stores: List<Store>
+)
