@@ -12,6 +12,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -78,28 +79,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             }
             fetchJson(lastLocation);
         }
-
-        /*var pinLocation : LatLng
-        // location = LatLng(37.566554, 126.978546) //서울시청 핀 코드
-        pinLocation = LatLng(storesByGeo.get(0).lat, storesByGeo.get(0).lng)
-        placeMarkerOnMap(pinLocation)*/
-
-        // Add a marker in Seoul and move the camera (처음 서울 기반 zoom)
-        /*
-        val myPlace = LatLng(37.56, 126.97) // 서울 코드
-        map.addMarker(MarkerOptions().position(myPlace).title("Marker in Seoul"))
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(myPlace, 12.0f)) // 초반 zoom 크기
-
-        map.getUiSettings().setZoomControlsEnabled(true)
-        map.setOnMarkerClickListener(this)
-        */
     }
 
     // Json Parser 기능 ( 현재 위도, 경도 값을 받아서 공공데이터 받아오기 )
     fun fetchJson(location: Location){
-        println("데어터를 가져 오는 중...")
-//        val key = "Your-key"
-
+        println("데이터를 가져 오는 중...")
         // maskApi 링크로 변경함
         val url = "https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1"
 
@@ -125,29 +109,33 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 //루트 object와 경로를 찾아서 설정해 주는데 이부분에서 개념이 안 잡혀서 헤메다. 원하는 데이터가 속에 속에 들어 있어서...
                 val rootObj = parser.parse(body.toString())
                     .getAsJsonObject().get("stores")
+
                 //여기까진 제대로 되고
                 val type = object : TypeToken<List<Store>>() {}.type
                 var storesByGeo = gson.fromJson<List<Store>>(rootObj, type)
 
-//                val storesByGeo =  gson.fromJson<List<Store>>(rootObj, StoresByGeo::class.java)
                 //썸네일을 위한 추가 작업
                 println("--------store[0]---------")
                 println(storesByGeo.get(0).name)
 
+                // runOnUiThread: 백그라운드에서 돌기 때문에 메인UI로 접근할 수 있도록 주는 메소드
+                // store리스트 루프 (핀 출력)
                 for (store in storesByGeo)
                 {
                     var pinLocation : LatLng
                     pinLocation = LatLng(store.lat, store.lng)
-                    runOnUiThread{ placeMarkerOnMap(pinLocation) } //마크 찍는 메소드 (ui는 메인쓰레드에서)
+                    //핀 찍는 메소드 (ui는 메인쓰레드) , 현재 매개변수로 남은개수랑 위치만 보내는데 가게 이름도 보내야 할듯
+                    runOnUiThread{ placeMarkerOnMap(pinLocation, store.remain_stat) }
+
                 }
 
-
-
-                //백그라운드에서 돌기 때문에 메인UI로 접근할 수 있도록 해줘야 한다.
+                //어뎁터 설정 (사용 안함)
+                /*
                 runOnUiThread {
-                    //어답터 설정
-//                    my_recycler_view.adapter = RecyclerViewAdapter(books)
+
+                    my_recycler_view.adapter = RecyclerViewAdapter(books)
                 }
+                */
             }
 
             override fun onFailure(call: Call, e: IOException) {
@@ -157,15 +145,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     }
 
     // 새로운 핀 생성 (아직 수정 더 해야함)
-    private fun placeMarkerOnMap(location: LatLng) {
+    private fun placeMarkerOnMap(location: LatLng, remain : String) {
         val position = location
-        map.addMarker(MarkerOptions()
+        var color = null
+        if(remain == "plenty")
+            //color =  이미지를 green으로 바꿔야함
+        else if (remain == "some")
+            //color =  이미지를 yellow으로 바꿔야함
+        else if (remain == "few")
+            //color =  이미지를 red으로 바꿔야함
+        else if (remain == "empty")
+            //color =  이미지를 gray로 바꿔야함
+
+        map.addMarker(MarkerOptions()   //MarkerOptions의 매개변수에 color를 넣어야함
             .position(position)
-            .title("Museum")
+            .title("Museum")    //이것도 store.name 를 매개변수로 받아야할 듯 ?
             .snippet("National Air and Space Museum"))
     }
 
-    //    위치 권한이 off인 경우, request하는 메소드
+    // 위치 권한이 꺼진 경우, 요청하는 메소드
     private fun setUpMap() {
         if (ActivityCompat.checkSelfPermission(this,
                 android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -179,7 +177,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             if (location != null) {
                 lastLocation = location
                 val currentLatLng = LatLng(location.latitude, location.longitude)
-                placeMarkerOnMap(currentLatLng)
+                //placeMarkerOnMap(currentLatLng, remain) 이거 사용할거면 매개변수 확인 할 것
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
             }
         }
