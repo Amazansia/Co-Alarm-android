@@ -23,6 +23,7 @@ import java.io.IOException
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private lateinit var map: GoogleMap
+    private lateinit var networkController: NetworkController
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     //private lateinit var storesByGeo : List<Store> //전역변수
 
@@ -75,11 +76,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 val currentLatLng = LatLng(location.latitude, location.longitude)
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 16f))
             }
-            fetchJson(lastLocation);
+            networkController.fetchJson(lastLocation);
         }
     }
-
-
 
     // 새로운 핀 생성 (아직 수정 더 해야함)
     private fun placeMarkerOnMap(location: LatLng, remain : String) {

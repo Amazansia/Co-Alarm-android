@@ -12,7 +12,7 @@ public class NetworkController
 {
 
     // Json Parser 기능 ( 현재 위도, 경도 값을 받아서 공공데이터 받아오기 )
-    fun fetchJson(location: Location){
+    fun fetchJson(location: Location) : {
         println("데이터를 가져 오는 중...")
         // maskApi 링크로 변경함
         val url = "https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1"
