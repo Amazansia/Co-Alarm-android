@@ -1,4 +1,4 @@
-package com.example.mapsactivity.data
+package com.example.mapsactivity
 
 data class Store(
     val addr: String,
