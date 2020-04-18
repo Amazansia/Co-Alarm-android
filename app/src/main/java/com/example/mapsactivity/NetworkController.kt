@@ -8,11 +8,14 @@ import com.google.gson.reflect.TypeToken
 import okhttp3.*
 import java.io.IOException
 
+private lateinit var storesByGeo: List<Store>
 public class NetworkController
 {
+    public constructor() {
 
+    }
     // Json Parser 기능 ( 현재 위도, 경도 값을 받아서 공공데이터 받아오기 )
-    fun fetchJson(location: Location) : {
+    fun fetchJson(location: Location) : List<Store> {
         println("데이터를 가져 오는 중...")
         // maskApi 링크로 변경함
         val url = "https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1"
@@ -42,7 +45,7 @@ public class NetworkController
 
                 //여기까진 제대로 되고
                 val type = object : TypeToken<List<Store>>() {}.type
-                var storesByGeo = gson.fromJson<List<Store>>(rootObj, type)
+                storesByGeo = gson.fromJson<List<Store>>(rootObj, type)
 
                 //썸네일을 위한 추가 작업
                 println("--------store[0]---------")
@@ -50,27 +53,13 @@ public class NetworkController
 
                 // runOnUiThread: 백그라운드에서 돌기 때문에 메인UI로 접근할 수 있도록 주는 메소드
                 // store리스트 루프 (핀 출력)
-                for (store in storesByGeo)
-                {
-                    var pinLocation : LatLng
-                    pinLocation = LatLng(store.lat, store.lng)
-                    //핀 찍는 메소드 (ui는 메인쓰레드) , 현재 매개변수로 남은개수랑 위치만 보내는데 가게 이름도 보내야 할듯
-                    runOnUiThread{ placeMarkerOnMap(pinLocation, store.remain_stat) }
-
-                }
-
-                //어뎁터 설정 (사용 안함)
-                /*
-                runOnUiThread {
-
-                    my_recycler_view.adapter = RecyclerViewAdapter(books)
-                }
-                */
             }
 
             override fun onFailure(call: Call, e: IOException) {
                 println("리퀘스트 실패")
             }
+
         })
     }
+    return storesByGeo
 }

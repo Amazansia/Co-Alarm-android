@@ -1,5 +1,7 @@
 package com.example.mapsactivity
 
+import java.lang.reflect.Constructor
+
 data class Store(
     val addr: String,
     val code: String,

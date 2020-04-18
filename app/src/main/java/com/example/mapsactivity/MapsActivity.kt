@@ -23,9 +23,8 @@ import java.io.IOException
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private lateinit var map: GoogleMap
-    private lateinit var networkController: NetworkController
+    private lateinit var networkController : NetworkController
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    //private lateinit var storesByGeo : List<Store> //전역변수
 
     //현재 위치 객체
     private lateinit var lastLocation: Location
@@ -42,7 +41,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
@@ -76,27 +74,39 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 val currentLatLng = LatLng(location.latitude, location.longitude)
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 16f))
             }
-            networkController.fetchJson(lastLocation);
+            networkController = NetworkController()
+            var storesByGeo = networkController.fetchJson(lastLocation)
+            placeMarkerOnMap(storesByGeo)
         }
     }
 
     // 새로운 핀 생성 (아직 수정 더 해야함)
-    private fun placeMarkerOnMap(location: LatLng, remain : String) {
-        val position = location
-        var color = null
-        if(remain == "plenty")
-            //color =  이미지를 green으로 바꿔야함
-        else if (remain == "some")
-            //color =  이미지를 yellow으로 바꿔야함
-        else if (remain == "few")
-            //color =  이미지를 red으로 바꿔야함
-        else if (remain == "empty")
-            //color =  이미지를 gray로 바꿔야함
+    private fun placeMarkerOnMap(storesByGeo: List<Store>) {
+        for (store in storesByGeo) {
+            var pinLocation: LatLng
+            pinLocation = LatLng(store.lat, store.lng)
+            //핀 찍는 메소드 (ui는 메인쓰레드) , 현재 매개변수로 남은개수랑 위치만 보내는데 가게 이름도 보내야 할듯
+            runOnUiThread {
+                val position = pinLocation
+//                var color = null
+//                var remain = store.remain_stat
+//                if(remain == "plenty")
+//                //color =  이미지를 green으로 바꿔야함
+//                else if (remain == "some")
+//                //color =  이미지를 yellow으로 바꿔야함
+//                else if (remain == "few")
+//                //color =  이미지를 red으로 바꿔야함
+//                else if (remain == "empty")
+//                //color =  이미지를 gray로 바꿔야함
 
-        map.addMarker(MarkerOptions()   //MarkerOptions의 매개변수에 color를 넣어야함
-            .position(position)
-            .title("Museum")    //이것도 store.name 를 매개변수로 받아야할 듯 ?
-            .snippet("National Air and Space Museum"))
+                if(this::networkController.isInitialized) {
+                    map.addMarker(MarkerOptions()   //MarkerOptions의 매개변수에 color를 넣어야함
+                        .position(position)
+                        .title(store.name)    //이것도 store.name 를 매개변수로 받아야할 듯 ?
+                        .snippet(store.stock_at))
+                }
+            }
+        }
     }
 
     // 위치 권한이 꺼진 경우, 요청하는 메소드
