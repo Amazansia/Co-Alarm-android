@@ -15,10 +15,10 @@ public class NetworkController
     public constructor() {
 
     }
-    private var storesByGeo: List<Store>? = null
 
     // Json Parser 기능 ( 현재 위도, 경도 값을 받아서 공공데이터 받아오기 )
-    fun fetchJson(location: Location) : List<Store>? {
+    fun fetchJson(location: Location, completion: (List<Store>?)-> void) {
+        //marker함수를 매개변수로 받아온다
         println("데이터를 가져 오는 중...")
         // maskApi 링크로 변경함
         val url = "https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1"
@@ -33,8 +33,8 @@ public class NetworkController
                 val body = response?.body()?.string()
 
                 if(body != null) {
-                    println("--------body---------")
-                    println(body)
+//                    println("--------body---------")
+//                    println(body)
                 } else {
                     println("error!")
                 }
@@ -48,7 +48,9 @@ public class NetworkController
 
                 //여기까진 제대로 되고
                 val type = object : TypeToken<List<Store>?>() {}.type
-                storesByGeo = gson.fromJson<List<Store>?>(rootObj, type)
+                var storesByGeo = gson.fromJson<List<Store>?>(rootObj, type)
+
+                completion(storesByGeo)
 
                 //썸네일을 위한 추가 작업
                 println("--------store[0]---------")
@@ -63,7 +65,6 @@ public class NetworkController
             }
 
         })
-        return storesByGeo
     }
 
 }

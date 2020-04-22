@@ -75,16 +75,27 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 16f))
             }
             networkController = NetworkController()
-            var storesByGeo = networkController.fetchJson(lastLocation)
-
-            placeMarkerOnMap(storesByGeo)
+            networkController.fetchJson(lastLocation) {
+                stores : List<Store>? ->
+                placeMarkerOnMap(stores)
+            }
+//            if (storesByGeo != null) {
+//                println(storesByGeo.get(0).name)
+//            }
+//            placeMarkerOnMap(storesByGeo)
         }
     }
 
     // 새로운 핀 생성 (아직 수정 더 해야함)
     private fun placeMarkerOnMap(storesByGeo: List<Store>?) {
         if (storesByGeo != null) {
+            println("****************")
+            println("****************")
+            println("****************")
             println(storesByGeo)
+            println("****************")
+            println("****************")
+            println("****************")
             for (store in storesByGeo) {
                 var pinLocation: LatLng
                 pinLocation = LatLng(store.lat, store.lng)
@@ -102,10 +113,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 //                else if (remain == "empty")
 //                //color =  이미지를 gray로 바꿔야함
 
-                        map.addMarker(MarkerOptions()   //MarkerOptions의 매개변수에 color를 넣어야함
-                            .position(position)
-                            .title(store.name)    //이것도 store.name 를 매개변수로 받아야할 듯 ?
-                         )
+                    map.addMarker(MarkerOptions()   //MarkerOptions의 매개변수에 color를 넣어야함
+                        .position(position)
+                        .title(store.name)    //이것도 store.name 를 매개변수로 받아야할 듯 ?
+                    )
 
                 }
             }
