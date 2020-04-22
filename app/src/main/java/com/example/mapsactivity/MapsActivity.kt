@@ -75,10 +75,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 16f))
             }
             networkController = NetworkController()
-            networkController.fetchJson(lastLocation) {
-                stores : List<Store>? ->
-                placeMarkerOnMap(stores)
-            }
+            networkController.fetchJson(lastLocation){storesByGeo : List<Store>? ->
+                placeMarkerOnMap(storesByGeo)}
 //            if (storesByGeo != null) {
 //                println(storesByGeo.get(0).name)
 //            }
@@ -89,32 +87,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     // 새로운 핀 생성 (아직 수정 더 해야함)
     private fun placeMarkerOnMap(storesByGeo: List<Store>?) {
         if (storesByGeo != null) {
-            println("****************")
-            println("****************")
-            println("****************")
-            println(storesByGeo)
-            println("****************")
-            println("****************")
-            println("****************")
             for (store in storesByGeo) {
-                var pinLocation: LatLng
+                var pinLocation : LatLng
                 pinLocation = LatLng(store.lat, store.lng)
                 //핀 찍는 메소드 (ui는 메인쓰레드) , 현재 매개변수로 남은개수랑 위치만 보내는데 가게 이름도 보내야 할듯
                 runOnUiThread {
-                    val position = pinLocation
-//                var color = null
-//                var remain = store.remain_stat
-//                if(remain == "plenty")
-//                //color =  이미지를 green으로 바꿔야함
-//                else if (remain == "some")
-//                //color =  이미지를 yellow으로 바꿔야함
-//                else if (remain == "few")
-//                //color =  이미지를 red으로 바꿔야함
-//                else if (remain == "empty")
-//                //color =  이미지를 gray로 바꿔야함
-
                     map.addMarker(MarkerOptions()   //MarkerOptions의 매개변수에 color를 넣어야함
-                        .position(position)
+                        .position(pinLocation)
                         .title(store.name)    //이것도 store.name 를 매개변수로 받아야할 듯 ?
                     )
 
