@@ -17,3 +17,16 @@ data class Store(
 data class StoresByGeo(
     val stores: List<Store>
 )
+
+data class Addresses (
+    val addresses: List<Address>
+)
+
+data class Address(
+    val distance: Double,
+    val englishAddress: String,
+    val jibunAddress: String,
+    val roadAddress: String,
+    val x: String,
+    val y: String
+)

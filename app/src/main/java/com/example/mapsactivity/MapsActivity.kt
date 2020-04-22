@@ -83,6 +83,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 //                println(storesByGeo.get(0).name)
 //            }
 //            placeMarkerOnMap(storesByGeo)
+            networkController.fetchGeocoding("서교동")
         }
     }
 
