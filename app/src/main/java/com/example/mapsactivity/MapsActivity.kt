@@ -76,18 +76,21 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             }
             networkController = NetworkController()
             var storesByGeo = networkController.fetchJson(lastLocation)
+
             placeMarkerOnMap(storesByGeo)
         }
     }
 
     // 새로운 핀 생성 (아직 수정 더 해야함)
-    private fun placeMarkerOnMap(storesByGeo: List<Store>) {
-        for (store in storesByGeo) {
-            var pinLocation: LatLng
-            pinLocation = LatLng(store.lat, store.lng)
-            //핀 찍는 메소드 (ui는 메인쓰레드) , 현재 매개변수로 남은개수랑 위치만 보내는데 가게 이름도 보내야 할듯
-            runOnUiThread {
-                val position = pinLocation
+    private fun placeMarkerOnMap(storesByGeo: List<Store>?) {
+        if (storesByGeo != null) {
+            println(storesByGeo)
+            for (store in storesByGeo) {
+                var pinLocation: LatLng
+                pinLocation = LatLng(store.lat, store.lng)
+                //핀 찍는 메소드 (ui는 메인쓰레드) , 현재 매개변수로 남은개수랑 위치만 보내는데 가게 이름도 보내야 할듯
+                runOnUiThread {
+                    val position = pinLocation
 //                var color = null
 //                var remain = store.remain_stat
 //                if(remain == "plenty")
@@ -99,14 +102,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 //                else if (remain == "empty")
 //                //color =  이미지를 gray로 바꿔야함
 
-                if(this::networkController.isInitialized) {
-                    map.addMarker(MarkerOptions()   //MarkerOptions의 매개변수에 color를 넣어야함
-                        .position(position)
-                        .title(store.name)    //이것도 store.name 를 매개변수로 받아야할 듯 ?
-                        .snippet(store.stock_at))
+                        map.addMarker(MarkerOptions()   //MarkerOptions의 매개변수에 color를 넣어야함
+                            .position(position)
+                            .title(store.name)    //이것도 store.name 를 매개변수로 받아야할 듯 ?
+                         )
+
                 }
             }
         }
+
     }
 
     // 위치 권한이 꺼진 경우, 요청하는 메소드
