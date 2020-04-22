@@ -77,13 +77,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 16f))
             }
             networkController = NetworkController()
-            networkController.fetchJson(lastLocation){storesByGeo : List<Store>? ->
+            networkController.fetchStore(lastLocation){storesByGeo : List<Store>? ->
                 placeMarkerOnMap(storesByGeo)}
 //            if (storesByGeo != null) {
 //                println(storesByGeo.get(0).name)
 //            }
 //            placeMarkerOnMap(storesByGeo)
-            networkController.fetchGeocoding("서교동")
+//            networkController.fetchGeocoding("서교동")
         }
     }
 

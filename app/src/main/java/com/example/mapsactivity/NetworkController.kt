@@ -20,7 +20,7 @@ public class NetworkController
     }
 
     // Json Parser 기능 ( 현재 위도, 경도 값을 받아서 공공데이터 약국정보 받아오기 )
-    fun fetchJson(location: Location, completion: (List<Store>?)-> Unit) {
+    fun fetchStore(location: Location, completion: (List<Store>?)-> Unit) {
         //marker함수를 매개변수로 받아온다
         println("데이터를 가져 오는 중...")
         // maskApi 링크로 변경함
