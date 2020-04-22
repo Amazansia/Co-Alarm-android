@@ -1,19 +1,21 @@
 package com.example.mapsactivity
 
+import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.location.Location
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import com.google.gson.reflect.TypeToken
@@ -39,7 +41,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         setContentView(R.layout.activity_maps)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
-                .findFragmentById(R.id.map) as SupportMapFragment
+            .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
@@ -84,6 +86,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
     }
 
+    private fun  bitmapDescriptorFromVector(context: Context, vectorResId:Int):BitmapDescriptor {
+        var vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+        vectorDrawable!!.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+        var bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        var canvas =  Canvas(bitmap);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
     // 새로운 핀 생성 (아직 수정 더 해야함)
     private fun placeMarkerOnMap(storesByGeo: List<Store>?) {
         if (storesByGeo != null) {
@@ -91,12 +102,34 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
                 var pinLocation : LatLng
                 pinLocation = LatLng(store.lat, store.lng)
                 //핀 찍는 메소드 (ui는 메인쓰레드) , 현재 매개변수로 남은개수랑 위치만 보내는데 가게 이름도 보내야 할듯
-                runOnUiThread {
-                    map.addMarker(MarkerOptions()   //MarkerOptions의 매개변수에 color를 넣어야함
-                        .position(pinLocation)
-                        .title(store.name)    //이것도 store.name 를 매개변수로 받아야할 듯 ?
-                    )
 
+                var remain : String = store.remain_stat
+
+                runOnUiThread {
+                         if (remain == "plenty"){
+                            map.addMarker(MarkerOptions()   //MarkerOptions의 매개변수에 color를 넣어야함
+                                .position(pinLocation)
+                                .title(store.name)
+                                .icon(bitmapDescriptorFromVector(this, R.drawable.ic_green)))
+                        }
+                        else if (remain == "some"){
+                            map.addMarker(MarkerOptions()   //MarkerOptions의 매개변수에 color를 넣어야함
+                                .position(pinLocation)
+                                .title(store.name)
+                                .icon(bitmapDescriptorFromVector(this, R.drawable.ic_yellow)))
+                        }
+                        else if (remain == "few"){
+                            map.addMarker(MarkerOptions()   //MarkerOptions의 매개변수에 color를 넣어야함
+                                .position(pinLocation)
+                                .title(store.name)
+                                .icon(bitmapDescriptorFromVector(this, R.drawable.ic_red)))
+                        }
+                        else {
+                            map.addMarker(MarkerOptions()   //MarkerOptions의 매개변수에 color를 넣어야함
+                                .position(pinLocation)
+                                .title(store.name)
+                                .icon(bitmapDescriptorFromVector(this, R.drawable.ic_gray)))
+                        }
                 }
             }
         }
