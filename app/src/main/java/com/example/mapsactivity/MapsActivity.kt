@@ -35,7 +35,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 
     //현재 위치 객체
     private lateinit var lastLocation: Location
-    private lateinit var searchLocation: Location
+    private var searchLocation: Location? = null
     //위치 권환 요청 객체
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -49,15 +49,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-        val searchbtn = findViewById<Button>(R.id.btn_search)
-        searchbtn.setOnClickListener{
-            inputtext = entertext.text.toString()
-            networkController = NetworkController()
-            networkController.fetchStore(lastLocation){storesByGeo : List<Store>? ->
-                placeMarkerOnMap(storesByGeo)
-            }
-            networkController.fetchGeocoding(inputtext,searchLocation)
-        }
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
@@ -101,6 +93,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
 //            placeMarkerOnMap(storesByGeo)
 //            networkController.fetchGeocoding("서교동")
         }
+        val searchbtn = findViewById<Button>(R.id.btn_search)
+        searchbtn.setOnClickListener{
+            inputtext = entertext.text.toString()
+            networkController = NetworkController()
+            networkController.fetchGeocoding(inputtext)
+
+            println("fetchGeocoding 성...공?"+ (searchLocation?.latitude ?: ) +" "+searchLocation.longitude)
+        }
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
 

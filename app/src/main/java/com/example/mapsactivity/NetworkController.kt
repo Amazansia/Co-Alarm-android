@@ -71,9 +71,10 @@ public class NetworkController
     }
 
     // Json Parser 기능 ( 검색창에 입력한 주소를 위도, 경도값으로 바꾸는 함수 )
-    fun fetchGeocoding(address: String,location: Location) {
+    fun fetchGeocoding(address: String) : Location {
         // OkHttp로 요청하기
         val text = URLEncoder.encode(address, "UTF-8")
+        lateinit var searchlocation: Location
         println(text)
         val url = URL("https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=${text}")
 
@@ -103,8 +104,8 @@ public class NetworkController
 
                 val type = object : TypeToken<List<Address>?>() {}.type
                 val addresses = gson.fromJson<List<Address>?>(rootObj, type)
-                location.longitude = (addresses?.get(0)?.x)?.toDouble()!!
-                location.latitude = (addresses?.get(0)?.y)?.toDouble()!!
+                searchlocation.longitude = (addresses?.get(0)?.x)?.toDouble()!!
+                searchlocation.latitude = (addresses?.get(0)?.y)?.toDouble()!!
 
 //                fetchStore(location){storesByGeo : List<Store>? ->
 //                    placaMarkerOnMap(store)
@@ -120,5 +121,8 @@ public class NetworkController
                 println("Failed to execute request")
             }
         })
+
+        return searchlocation
+
     }
 }
