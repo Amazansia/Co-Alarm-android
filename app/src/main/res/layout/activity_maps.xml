@@ -33,10 +33,10 @@
 
     <Button
         android:id="@+id/btn_search"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginRight="30dp"
         android:layout_gravity="right"
-        android:background="@drawable/ic_search" />
+        android:layout_marginTop="30dp"
+        android:layout_marginRight="30dp" />
 </FrameLayout>
