@@ -12,10 +12,10 @@ import java.net.URLEncoder
 
 public class NetworkController
 {
-    val clientId = "uyuvw49pig"
-    val clientSecret = "BOJCfcK5klMMoKOgtb1LUhwlpCOsxPXZepAAE0Kb"
+        val clientId = "uyuvw49pig"
+        val clientSecret = "BOJCfcK5klMMoKOgtb1LUhwlpCOsxPXZepAAE0Kb"
 
-    public constructor() {
+        public constructor() {
 
     }
 
@@ -25,7 +25,7 @@ public class NetworkController
         println("데이터를 가져 오는 중...")
         // maskApi 링크로 변경함
         val url = "https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1"
-
+        location.longitude = 10.0
         // 임의로 현재 위치로 설정
         val query = "/storesByGeo/json?"+ "lat=" + location.latitude + "&lng=" + location.longitude + "&m=1000";
         println("--------query---------\n" + url + query)
@@ -71,9 +71,9 @@ public class NetworkController
     }
 
     // Json Parser 기능 ( 검색창에 입력한 주소를 위도, 경도값으로 바꾸는 함수 )
-    fun fetchGeocoding(address: String) {
+    fun fetchGeocoding(address: String,location: Location) {
         // OkHttp로 요청하기
-        val text = URLEncoder.encode("${address[0]}", "UTF-8")
+        val text = URLEncoder.encode(address, "UTF-8")
         println(text)
         val url = URL("https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query=${text}")
 
@@ -103,7 +103,12 @@ public class NetworkController
 
                 val type = object : TypeToken<List<Address>?>() {}.type
                 val addresses = gson.fromJson<List<Address>?>(rootObj, type)
+                location.longitude = (addresses?.get(0)?.x)?.toDouble()!!
+                location.latitude = (addresses?.get(0)?.y)?.toDouble()!!
 
+//                fetchStore(location){storesByGeo : List<Store>? ->
+//                    placaMarkerOnMap(store)
+//                }
                 println("*********************")
                 println("*********************")
                 println(addresses?.get(0)?.x)

@@ -1,11 +1,14 @@
 package com.example.mapsactivity
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.location.Location
 import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -19,6 +22,7 @@ import com.google.android.gms.maps.model.*
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import com.google.gson.reflect.TypeToken
+import kotlinx.android.synthetic.main.activity_maps.*
 import okhttp3.*
 import java.io.IOException
 
@@ -27,9 +31,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     private lateinit var map: GoogleMap
     private lateinit var networkController : NetworkController
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var inputtext : String
 
     //현재 위치 객체
     private lateinit var lastLocation: Location
+    private lateinit var searchLocation: Location
     //위치 권환 요청 객체
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -43,6 +49,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        val searchbtn = findViewById<Button>(R.id.btn_search)
+        searchbtn.setOnClickListener{
+            inputtext = entertext.text.toString()
+            networkController = NetworkController()
+            networkController.fetchStore(lastLocation){storesByGeo : List<Store>? ->
+                placeMarkerOnMap(storesByGeo)
+            }
+            networkController.fetchGeocoding(inputtext,searchLocation)
+        }
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
     }
 
@@ -57,6 +72,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
      */
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
+
 
         map.uiSettings.isZoomControlsEnabled = true
         map.setOnMarkerClickListener(this)
@@ -87,7 +103,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
         }
     }
 
-    private fun  bitmapDescriptorFromVector(context: Context, vectorResId:Int):BitmapDescriptor {
+
+
+    private fun bitmapDescriptorFromVector(context: Context, vectorResId:Int):BitmapDescriptor {
         var vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
         vectorDrawable!!.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
         var bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
